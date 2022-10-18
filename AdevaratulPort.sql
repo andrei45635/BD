@@ -129,5 +129,4 @@ CREATE TABLE Sailors(
 	SailorAge INT CHECK (SailorAge >= 18 AND SailorAge <= 65),
 	SailorTimeAway INT,
 	ShipID INT NOT NULL FOREIGN KEY REFERENCES Ships(ShipID),
-	CaptainID INT NOT NULL FOREIGN KEY REFERENCES Captains(CaptainID)
 );
