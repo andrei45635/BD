@@ -137,3 +137,42 @@ ALTER TABLE Managers ADD ManagerName VARCHAR(64)
 ALTER TABLE Employees ADD EmployeeName VARCHAR(64)
 ALTER TABLE Ships ADD ShipName VARCHAR(64)
 ALTER TABLE Corporations ADD CorpoName VARCHAR(64)
+
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1750, 500, 35, 10, 'Barney Calhoun');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1950, 650, 43, 16, 'Henry Ross');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 150, 27, 3, 'Walter Hartwell White');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (2550, 750, 49, 23, 'Michael Ehrmantrout');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 250, 25, 3, 'Daniel Hayter');
+
+
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1250, 300, 25, 3, 'Jesse Pinkman');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1350, 250, 37, 1, 'Gina Cross');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1450, 450, 49, 1, 'James Foreman');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1225, 150, 21, 2, 'Andrew Barnes');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1200, 175, 29, 2, 'Frank Breen');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1215, 235, 35, 4, 'Huell Babbitt');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1345, 225, 18, 6, 'Robert Lewis');
+
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Small', 'Hyundai');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Samsung');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Konecranes');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Medium', 'Seacom');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Other', 'Mantsines');
+
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (1, 1, 'JesseYo');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (2, 5, 'FrankB');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (3, 6, 'HuellBabby');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (4, 2, 'Gina');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (5, 4, 'BarnacleMan');
+
+SELECT * FROM Managers;
+SELECT * FROM Employees;
+SELECT * FROM Machinery;
+SELECT * FROM MachineryEmployees;
+
+SELECT ManagerName, EmployeeName, MachineryUser
+FROM Managers, Employees, MachineryEmployees
+WHERE ManagerExperience >= 10 
+GROUP BY ManagerName, EmployeeName, MachineryUser
+HAVING EmployeeSalary >= 1400 OR EmployeeAge BETWEEN 18 AND 45
+ORDER BY ManagerName, EmployeeName, MachineryUser
