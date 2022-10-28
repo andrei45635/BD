@@ -129,7 +129,6 @@ CREATE TABLE Sailors(
 	SailorAge INT CHECK (SailorAge >= 18 AND SailorAge <= 65),
 	SailorTimeAway INT,
 	ShipID INT NOT NULL FOREIGN KEY REFERENCES Ships(ShipID),
-	CaptainID INT NOT NULL FOREIGN KEY REFERENCES Captains(CaptainID)
 );
 
 ALTER TABLE Captains ADD CaptainName VARCHAR(64)
@@ -138,7 +137,6 @@ ALTER TABLE Managers ADD ManagerName VARCHAR(64)
 ALTER TABLE Employees ADD EmployeeName VARCHAR(64)
 ALTER TABLE Ships ADD ShipName VARCHAR(64)
 ALTER TABLE Corporations ADD CorpoName VARCHAR(64)
-ALTER TABLE MachineryEmployees ADD MachineryUser VARCHAR(64)
 
 --- INTEROGARI LAB ---
 /*
@@ -153,12 +151,13 @@ HAVING SUM(EmployeeSalary) BETWEEN 1200 AND 9999
 ORDER BY EmployeeName
 
 /*
-	Grupeaza angajatii care au un salariu mai mic de 1400 de euro cu managerii cu experienta mai mica de 15 ani
+	Grupeaza angajatii care au un salariu mai mic de 1400 de euro cu managerii lor si cu depozitele unde lucreaza
 */
-SELECT e.EmployeeName, m.ManagerName, m.ManagerExperience, e.EmployeeSalary
-FROM Employees e INNER JOIN Managers m ON e.ManagerID = m.ManagerID
-GROUP BY e.EmployeeName, m.ManagerName, m.ManagerExperience, e.EmployeeSalary
-HAVING e.EmployeeSalary <= 1400 AND m.ManagerExperience < 15
+SELECT e.EmployeeName, m.ManagerName, e.EmployeeSalary
+FROM Employees e INNER JOIN WarehouseEmployees we ON e.EmployeeID = we.EmployeeID
+				 INNER JOIN Managers m ON m.ManagerID = e.EmployeeID
+GROUP BY e.EmployeeName, m.ManagerName,e.EmployeeSalary
+HAVING e.EmployeeSalary <= 1400
 ORDER BY m.ManagerName
 
 /*
@@ -175,25 +174,105 @@ ORDER BY c.CaptainExperience ASC
 /*
 	Grupeaza bunurile din magazii in functie de pretul lor brut
 */
-SELECT DISTINCT g.GoodsName, w.WarehouseGoodsName, g.GoodsPrice, w.WarehouseCapacity, g.GoodsWeight
-FROM Goods g INNER JOIN WarehouseGoods wg ON wg.GoodsID = g.GoodsID
-			 INNER JOIN Warehouses w ON w.WarehouseID = wg.WarehouseID
-GROUP BY g.GoodsName, w.WarehouseGoodsName, g.GoodsPrice, w.WarehouseCapacity, g.GoodsWeight
-HAVING g.GoodsPrice * g.GoodsWeight <= 599999
-ORDER BY g.GoodsPrice ASC
+SELECT DISTINCT g.GoodsName, pretBrut = g.GoodsPrice * g.GoodsWeight
+FROM WarehouseGoods wg INNER JOIN Goods g ON wg.GoodsID = g.GoodsID
+					   INNER JOIN Warehouses w ON w.WarehouseID = wg.WarehouseID
+GROUP BY g.GoodsName, g.GoodsPrice, g.GoodsWeight
+HAVING AVG(w.WarehouseCapacity) BETWEEN 2000 AND 7000
+ORDER BY g.GoodsName ASC
 
 /*
-	Grupeaza bunurile livrate de nave romanesti
+	Grupeaza bunurile livrate de nave romanesti cu pretul brut intre 100k si 10M 
 */
 SELECT s.ShipCountry, g.GoodsName, g.GoodsPrice, s.ShipName, s.ShipType
 FROM Ships s INNER JOIN ShipGoods sg ON s.ShipID = sg.ShipID
 			 INNER JOIN Goods g ON g.GoodsID = sg.GoodsID
 WHERE s.ShipCountry = 'Romania'
 GROUP BY s.ShipCountry, g.GoodsName, g.GoodsPrice, s.ShipName, s.ShipType
-HAVING AVG(g.GoodsPrice * g.GoodsWeight) <= 999999
+HAVING AVG(g.GoodsPrice * g.GoodsWeight) BETWEEN POWER(10,5) AND POWER(10,7)
 ORDER BY g.GoodsPrice DESC
 
+/*
+	Grupeaza bunurile cu pretul aflat intre 100k si 10M in functie de companii
+*/
+SELECT s.ShipName, c.CorpoName, g.GoodsName, g.GoodsPrice, sg.CargoGoodsWeight
+FROM Ships s INNER JOIN ShipGoods sg ON s.ShipID = sg.ShipID
+			          INNER JOIN Corporations c ON c.CorporationID = s.ShipID
+					  LEFT OUTER JOIN Goods g ON g.GoodsID = sg.GoodsID
+WHERE s.ShipCountry = c.CorporationCountry
+GROUP BY s.ShipName, c.CorpoName, g.GoodsName, g.GoodsPrice, sg.CargoGoodsWeight
+HAVING g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
+ORDER BY s.ShipName ASC
+
+/*
+	Grupeaza angajatii aflati in subordinea unui manager cu bunurile depozitului unde lucreaza
+*/
+SELECT DISTINCT e.EmployeeName, m.ManagerName --, w.WarehouseGoodsName
+FROM Employees e INNER JOIN Managers m ON e.ManagerID = m.ManagerID
+							   INNER JOIN WarehouseEmployees we ON we.EmployeeID = e.EmployeeID
+							   INNER JOIN Warehouses w ON we.WarehouseID = w.WarehouseID
+WHERE e.EmployeeAge BETWEEN 18 AND 28 -- AND m.ManagerExperience > 10
+GROUP BY e.EmployeeName, m.ManagerName  --, w.WarehouseGoodsName
+HAVING AVG(e.EmployeeSalary) BETWEEN 1200 AND 1900
+ORDER BY e.EmployeeName ASC
+
+/*
+	Grupeaza marinarii de pe nave romanesti cu capitanii navelor
+*/
+SELECT /*DISTINCT*/ sl.SailorName, s.ShipName, sl.SailorTimeAway --sl.SailorSalary
+FROM Sailors sl INNER JOIN Ships s ON s.ShipID = sl.ShipID
+				INNER JOIN Captains c ON c.CaptainID = s.ShipID
+WHERE s.ShipCountry = 'Romania'
+GROUP BY sl.SailorName, s.ShipName, sl.SailorTimeAway --sl.SailorSalary
+ORDER BY sl.SailorTimeAway
+
+/*
+	Grupeaza corporatiile cu bunurile si resursele pe care le livreaza
+*/
+SELECT c.CorpoName, g.GoodsName, r.ResourceName
+FROM CorporationGoods cg INNER JOIN Corporations c ON c.CorporationID = cg.CorporationID
+				         INNER JOIN Goods g ON cg.GoodsID = g.GoodsID
+						 INNER JOIN CorporationResources cr ON cr.CorporationID = c.CorporationID
+						 INNER JOIN Resources r ON r.ResourceID = cr.ResourceID
+WHERE c.CorporationCountry = 'Romania' OR c.CorporationCountry = 'Austria'
+
+/*
+	Grupeaza resursele din depozite cu corporatiile de la care provin filtrate in functie de tara (RO sau RU)
+*/
+SELECT DISTINCT r.ResourceName, c.CorpoName
+FROM Resources r INNER JOIN WarehouseResources wr ON r.ResourceID = wr.ResourceID
+				 INNER JOIN Warehouses w ON w.WarehouseID = wr.WarehouseID
+				 INNER JOIN CorporationResources cr ON cr.ResourceID = r.ResourceID
+				 INNER JOIN Corporations c ON c.CorporationID = cr.CorporationID
+WHERE c.CorporationCountry = 'Romania' OR c.CorporationCountry = 'Russia'
 --- INTEROGARI LAB ---
+
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1750, 500, 35, 10, 'Barney Calhoun');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1950, 650, 43, 16, 'Henry Ross');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 150, 27, 3, 'Walter Hartwell White');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (2550, 750, 49, 23, 'Michael Ehrmantrout');
+INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 250, 25, 3, 'Daniel Hayter');
+
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1250, 300, 25, 3, 'Jesse Pinkman');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1350, 250, 37, 1, 'Gina Cross');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1450, 450, 49, 1, 'James Foreman');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1225, 150, 21, 2, 'Andrew Barnes');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1200, 175, 29, 2, 'Frank Breen');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1215, 235, 35, 4, 'Huell Babbitt');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1345, 225, 18, 6, 'Robert Lewis');
+
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Small', 'Hyundai');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Samsung');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Konecranes');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Medium', 'Seacom');
+INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Other', 'Mantsines');
+
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (1, 1, 'JesseYo');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (2, 5, 'FrankB');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (3, 6, 'HuellBabby');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (4, 2, 'Gina');
+INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (5, 4, 'BarnacleMan');
+
 INSERT INTO Goods(GoodsType, GoodsName, GoodsWeight, GoodsPrice) VALUES ('Special', 'Half-Life', 4200, 59.99)
 INSERT INTO Goods(GoodsType, GoodsName, GoodsWeight, GoodsPrice) VALUES ('Industrial', 'Steel Rods', 9000, 119.99)
 INSERT INTO Goods(GoodsType, GoodsName, GoodsWeight, GoodsPrice) VALUES ('Industrial', 'Furnaces', 9999, 599.99)
@@ -234,38 +313,13 @@ INSERT INTO Captains(CaptainID, CaptainSalary, CaptainBonus, CaptainAge, Captain
 INSERT INTO Captains(CaptainID, CaptainSalary, CaptainBonus, CaptainAge, CaptainExperience, CaptainName) VALUES (6, 3800, 900, 47, 20, 'Gordon Freeman')
 INSERT INTO Captains(CaptainID, CaptainSalary, CaptainBonus, CaptainAge, CaptainExperience, CaptainName) VALUES (2, 4000, 1100, 52, 32, 'G-Man')
 
-INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1750, 500, 35, 10, 'Barney Calhoun');
-INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1950, 650, 43, 16, 'Henry Ross');
-INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 150, 27, 3, 'Walter Hartwell White');
-INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (2550, 750, 49, 23, 'Michael Ehrmantrout');
-INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 250, 25, 3, 'Daniel Hayter');
-
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1250, 300, 25, 3, 'Jesse Pinkman');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1350, 250, 37, 1, 'Gina Cross');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1450, 450, 49, 1, 'James Foreman');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1225, 150, 21, 2, 'Andrew Barnes');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1200, 175, 29, 2, 'Frank Breen');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1215, 235, 35, 4, 'Huell Babbitt');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1345, 225, 18, 6, 'Robert Lewis');
-
-INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Small', 'Hyundai');
-INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Samsung');
-INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Konecranes');
-INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Medium', 'Seacom');
-INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Other', 'Mantsines');
-
-INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (1, 1, 'JesseYo');
-INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (2, 5, 'FrankB');
-INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (3, 6, 'HuellBabby');
-INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (4, 2, 'Gina');
-INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (5, 4, 'BarnacleMan');
-
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (2, 2)
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (1, 6)
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (4, 4)
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (6, 7)
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (3, 2)
 INSERT INTO WarehouseGoods(WarehouseID, GoodsID) VALUES (5, 4)
+ALTER TABLE WarehouseGoods DROP COLUMN GoodsTonnage
 
 INSERT INTO ShipGoods(ShipID, GoodsID, CargoGoodsWeight) VALUES (7, 3, 8999)
 INSERT INTO ShipGoods(ShipID, GoodsID, CargoGoodsWeight) VALUES (5, 2, 2999)
@@ -281,9 +335,65 @@ INSERT INTO Resources(ResourceType, ResourceName, ResourcePrice, ResourceWeight)
 INSERT INTO Resources(ResourceType, ResourceName, ResourcePrice, ResourceWeight) VALUES ('Other', 'Gravel', 55.99, 9999)
 INSERT INTO Resources(ResourceType, ResourceName, ResourcePrice, ResourceWeight) VALUES ('Other', 'Tungsten', 42.99, 1299)
 
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1750, 500, 28, 12, 1, 'Andrei Munteanu')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (2500, 700, 48, 12, 1, 'Mihaly Vitez')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1550, 250, 33, 9, 5, 'Umberto Fesa')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1650, 340, 25, 4, 6, 'Nicholas Soldab')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1820, 420, 38, 6, 7, 'Rares Bogdan')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1945, 569, 29, 6, 7, 'Mihai Gadea')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1725, 159, 37, 12, 4, 'Mircea Badea')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1984, 360, 51, 12, 3, 'George Orwell')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1555, 150, 24, 3, 2, 'Andrei Munteanu')
+INSERT INTO Sailors(SailorSalary, SailorBonus, SailorAge, SailorTimeAway, ShipID, SailorName) VALUES (1500, 100, 64, 12, 1, 'Traian Basescu')
+
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (1, 1, 4995)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (3, 7, 1971)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (3, 2, 2482)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (1, 4, 4995)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (2, 5, 3492)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (2, 3, 1009)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (1, 6, 4995)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (4, 7, 2482)
+INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (3, 3, 549)
+
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 1)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 5)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (2, 4)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (3, 6)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (4, 2)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (5, 3)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 6)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 3)
+
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (1, 1)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (6, 1)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (6, 3)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (6, 2)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (7, 4)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (7, 5)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (2, 4)
+INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (5, 3)
+
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (7, 7)
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (3, 1)
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (3, 8)
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (4, 6)
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (5, 3)
+INSERT INTO CorporationGoods(CorporationID, GoodsID) VALUES (2, 2)
+
+INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (1, 1, 500)
+INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (3, 3, 1205)
+INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (2, 2, 954)
+INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (4, 4, 2412)
+INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (4, 5, 4521)
+
 SELECT * FROM Captains;
+SELECT * FROM Sailors;
 SELECT * FROM Corporations;
+SELECT * FROM CorporationGoods;
+SELECT * FROM CorporationResources;
 SELECT * FROM Ships;
+SELECT * FROM ShipResources;
 SELECT * FROM Goods;
 SELECT * FROM Managers;
 SELECT * FROM Employees;
@@ -292,7 +402,9 @@ SELECT * FROM MachineryEmployees;
 SELECT * FROM ShipGoods;
 SELECT * FROM Warehouses;
 SELECT * FROM WarehouseGoods;
+SELECT * FROM WarehouseEmployees;
 SELECT * FROM Resources;
+SELECT * FROM WarehouseResources;
 
 DELETE FROM Goods
 DBCC CHECKIDENT ('Goods', RESEED, 0)
