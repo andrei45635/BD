@@ -3,6 +3,7 @@ GO
 
 USE Port;
 
+--- CREARE BAZA DE DATE ---
 CREATE TABLE Managers(
 	ManagerID INT NOT NULL PRIMARY KEY IDENTITY,
 	ManagerSalary FLOAT CHECK (ManagerSalary >= 1500),
@@ -130,45 +131,47 @@ CREATE TABLE Sailors(
 	SailorTimeAway INT,
 	ShipID INT NOT NULL FOREIGN KEY REFERENCES Ships(ShipID),
 );
+--- CREARE BAZA DE DATE ---
 
+--- ALTERARI ---
 ALTER TABLE Captains ADD CaptainName VARCHAR(64)
 ALTER TABLE Sailors ADD SailorName VARCHAR(64)
 ALTER TABLE Managers ADD ManagerName VARCHAR(64)
 ALTER TABLE Employees ADD EmployeeName VARCHAR(64)
 ALTER TABLE Ships ADD ShipName VARCHAR(64)
 ALTER TABLE Corporations ADD CorpoName VARCHAR(64)
+--- ALTERARI ---
 
 --- INTEROGARI LAB ---
 /*
-	Grupeaza angajatii care au varsta intre 18 si 31 de ani cu masinariile pe care le folosesc
+	Grupeaza angajatii care au varsta intre 18 si 31 de ani care au salariu minim pe economie cu masinariile pe care le folosesc
 */
-SELECT e.EmployeeName, mch.MachineryUser, mech.MachineryManufacturer
+SELECT e.EmployeeName, e.EmployeeAge, mch.MachineryUser, mech.MachineryManufacturer
 FROM Employees e INNER JOIN MachineryEmployees mch ON e.EmployeeID = mch.EmployeeID 
 	             INNER JOIN Machinery mech ON mech.MachineryID = mch.MachineryID
-WHERE EmployeeAge BETWEEN 18 AND 31 AND EmployeeSalary + EmployeeBonus <= 2000
-GROUP BY e.EmployeeName, mech.MachineryManufacturer, mch.MachineryUser
-HAVING SUM(EmployeeSalary) BETWEEN 1200 AND 9999
+WHERE EmployeeAge BETWEEN 18 AND 31 
+GROUP BY e.EmployeeName, e.EmployeeAge, mch.MachineryUser, mech.MachineryManufacturer
+HAVING AVG(EmployeeSalary) BETWEEN 1200 AND 1400
 ORDER BY EmployeeName
 
 /*
 	Grupeaza angajatii care au un salariu mai mic de 1400 de euro cu managerii lor si cu depozitele unde lucreaza
 */
-SELECT e.EmployeeName, m.ManagerName, e.EmployeeSalary
+SELECT e.EmployeeName, m.ManagerName, e.EmployeeSalary, we.WarehouseID
 FROM Employees e INNER JOIN WarehouseEmployees we ON e.EmployeeID = we.EmployeeID
 				 INNER JOIN Managers m ON m.ManagerID = e.EmployeeID
-GROUP BY e.EmployeeName, m.ManagerName,e.EmployeeSalary
+GROUP BY e.EmployeeName, m.ManagerName,e.EmployeeSalary, we.WarehouseID
 HAVING AVG(e.EmployeeSalary) <= 1400
 ORDER BY m.ManagerName
 
 /*
 	Grupeaza capitanii cu corporatiile care detin navele pe care le conduc
 */
-SELECT DISTINCT c.CaptainExperience, c.CaptainName, s.ShipName, cp.CorpoName, c.CaptainSalary, c.CaptainBonus
+SELECT DISTINCT c.CaptainName, c.CaptainSalary + c.CaptainBonus * c.CaptainExperience * 0.125 AS monthlySalary, c.CaptainExperience, s.ShipName, cp.CorpoName, c.CaptainBonus
 FROM Captains c INNER JOIN Ships s ON c.CaptainID = s.ShipID
 				INNER JOIN Corporations cp ON s.CorporationID = cp.CorporationID
 WHERE c.CaptainExperience >= 15
 GROUP BY c.CaptainName, c.CaptainExperience, s.ShipName, cp.CorpoName, c.CaptainSalary, c.CaptainBonus
---HAVING c.CaptainBonus <= c.CaptainSalary/c.CaptainExperience * 125
 ORDER BY c.CaptainExperience ASC
 
 /*
@@ -201,33 +204,32 @@ FROM Ships s INNER JOIN ShipGoods sg ON s.ShipID = sg.ShipID
 					  LEFT OUTER JOIN Goods g ON g.GoodsID = sg.GoodsID
 WHERE s.ShipCountry = c.CorporationCountry AND g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
 GROUP BY s.ShipName, c.CorpoName, g.GoodsName, g.GoodsPrice, sg.CargoGoodsWeight
---HAVING g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
 ORDER BY s.ShipName ASC
 
 /*
 	Grupeaza angajatii aflati in subordinea unui manager cu bunurile depozitului unde lucreaza
 */
-SELECT DISTINCT e.EmployeeName, m.ManagerName --, w.WarehouseGoodsName
+SELECT DISTINCT e.EmployeeName, m.ManagerName
 FROM Employees e INNER JOIN Managers m ON e.ManagerID = m.ManagerID
 							   INNER JOIN WarehouseEmployees we ON we.EmployeeID = e.EmployeeID
 							   INNER JOIN Warehouses w ON we.WarehouseID = w.WarehouseID
-WHERE e.EmployeeAge BETWEEN 18 AND 28 -- AND m.ManagerExperience > 10
-GROUP BY e.EmployeeName, m.ManagerName  --, w.WarehouseGoodsName
+WHERE e.EmployeeAge BETWEEN 18 AND 28
+GROUP BY e.EmployeeName, m.ManagerName
 HAVING AVG(e.EmployeeSalary) BETWEEN 1200 AND 1900
 ORDER BY e.EmployeeName ASC
 
 /*
 	Grupeaza marinarii de pe nave romanesti cu capitanii navelor
 */
-SELECT /*DISTINCT*/ sl.SailorName, s.ShipName, sl.SailorTimeAway --sl.SailorSalary
+SELECT sl.SailorName, s.ShipName, sl.SailorTimeAway 
 FROM Sailors sl INNER JOIN Ships s ON s.ShipID = sl.ShipID
 				INNER JOIN Captains c ON c.CaptainID = s.ShipID
 WHERE s.ShipCountry = 'Romania'
-GROUP BY sl.SailorName, s.ShipName, sl.SailorTimeAway --sl.SailorSalary
+GROUP BY sl.SailorName, s.ShipName, sl.SailorTimeAway 
 ORDER BY sl.SailorTimeAway
 
 /*
-	Grupeaza corporatiile cu bunurile si resursele pe care le livreaza
+	Grupeaza corporatiile din Romania sau Austria cu bunurile si resursele pe care le livreaza
 */
 SELECT c.CorpoName, g.GoodsName, r.ResourceName
 FROM CorporationGoods cg INNER JOIN Corporations c ON c.CorporationID = cg.CorporationID
@@ -247,6 +249,7 @@ FROM Resources r INNER JOIN WarehouseResources wr ON r.ResourceID = wr.ResourceI
 WHERE c.CorporationCountry = 'Romania' OR c.CorporationCountry = 'Russia'
 --- INTEROGARI LAB ---
 
+--- INSERARI DE DATE --- 
 INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1750, 500, 35, 10, 'Barney Calhoun');
 INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1950, 650, 43, 16, 'Henry Ross');
 INSERT INTO Managers(ManagerSalary, ManagerBonus, ManagerAge, ManagerExperience, ManagerName) VALUES (1650, 150, 27, 3, 'Walter Hartwell White');
@@ -386,7 +389,9 @@ INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (3
 INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (2, 2, 954)
 INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (4, 4, 2412)
 INSERT INTO WarehouseResources(WarehouseID, ResourceID, OccupiedSpace) VALUES (4, 5, 4521)
+--- INSERARI DE DATE --- 
 
+--- VERIFICARI --- 
 SELECT * FROM Captains;
 SELECT * FROM Sailors;
 SELECT * FROM Corporations;
@@ -405,6 +410,7 @@ SELECT * FROM WarehouseGoods;
 SELECT * FROM WarehouseEmployees;
 SELECT * FROM Resources;
 SELECT * FROM WarehouseResources;
+--- VERIFICARI ---
 
 DELETE FROM Goods
 DBCC CHECKIDENT ('Goods', RESEED, 0)
