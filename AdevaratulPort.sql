@@ -157,7 +157,7 @@ SELECT e.EmployeeName, m.ManagerName, e.EmployeeSalary
 FROM Employees e INNER JOIN WarehouseEmployees we ON e.EmployeeID = we.EmployeeID
 				 INNER JOIN Managers m ON m.ManagerID = e.EmployeeID
 GROUP BY e.EmployeeName, m.ManagerName,e.EmployeeSalary
-HAVING e.EmployeeSalary <= 1400
+HAVING AVG(e.EmployeeSalary) <= 1400
 ORDER BY m.ManagerName
 
 /*
@@ -168,7 +168,7 @@ FROM Captains c INNER JOIN Ships s ON c.CaptainID = s.ShipID
 				INNER JOIN Corporations cp ON s.CorporationID = cp.CorporationID
 WHERE c.CaptainExperience >= 15
 GROUP BY c.CaptainName, c.CaptainExperience, s.ShipName, cp.CorpoName, c.CaptainSalary, c.CaptainBonus
-HAVING c.CaptainBonus <= c.CaptainSalary/c.CaptainExperience * 125
+--HAVING c.CaptainBonus <= c.CaptainSalary/c.CaptainExperience * 125
 ORDER BY c.CaptainExperience ASC
 
 /*
@@ -199,9 +199,9 @@ SELECT s.ShipName, c.CorpoName, g.GoodsName, g.GoodsPrice, sg.CargoGoodsWeight
 FROM Ships s INNER JOIN ShipGoods sg ON s.ShipID = sg.ShipID
 			          INNER JOIN Corporations c ON c.CorporationID = s.ShipID
 					  LEFT OUTER JOIN Goods g ON g.GoodsID = sg.GoodsID
-WHERE s.ShipCountry = c.CorporationCountry
+WHERE s.ShipCountry = c.CorporationCountry AND g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
 GROUP BY s.ShipName, c.CorpoName, g.GoodsName, g.GoodsPrice, sg.CargoGoodsWeight
-HAVING g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
+--HAVING g.GoodsPrice * sg.CargoGoodsWeight BETWEEN POWER(10, 5) AND POWER(10, 7)
 ORDER BY s.ShipName ASC
 
 /*
