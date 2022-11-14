@@ -131,6 +131,12 @@ CREATE TABLE Sailors(
 	SailorTimeAway INT,
 	ShipID INT NOT NULL FOREIGN KEY REFERENCES Ships(ShipID),
 );
+
+CREATE TABLE Versions(
+	VersionNo INT
+);
+INSERT INTO Versions(VersionNo) VALUES(0)
+SELECT * FROM Versions
 --- CREARE BAZA DE DATE ---
 
 --- ALTERARI ---
