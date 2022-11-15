@@ -1,7 +1,7 @@
 USE [Port]
 GO
 
-CREATE PROCEDURE main
+ALTER PROCEDURE [dbo].[main]
 @newVers VARCHAR(50)
 AS
 BEGIN
@@ -34,9 +34,11 @@ BEGIN
 	EXEC @nextVers
 END	
 
+PRINT('Suntem la versiunea ' + CONVERT(VARCHAR(50), @newVers))
 TRUNCATE TABLE Versions
 INSERT INTO Versions(VersionNo) VALUES (@newVers)
 END
 
 
-EXEC main 1
+EXEC main 3
+SELECT * FROM Versions
