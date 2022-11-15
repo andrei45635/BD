@@ -1,11 +1,13 @@
 USE [Port]
 GO 
 
---Readuce la versiunea 3
-CREATE PROCEDURE down_from_v3
+--Readuce la versiunea 4
+CREATE PROCEDURE [dbo].[down_from_v3]
 AS
 BEGIN
-DROP TABLE Visitor
+ALTER TABLE Visitor
+DROP COLUMN VisitorCountry
+PRINT('Visitor nu mai are tara')
 END
 
 EXEC down_from_v3

@@ -1,12 +1,12 @@
 USE [Port]
 GO 
 
---Readuce la versiunea 2
-CREATE PROCEDURE down_from_v2
+--Readuce la versiunea 3
+CREATE PROCEDURE [dbo].[down_from_v2]
 AS
-BEGIN 
-ALTER TABLE Sailors 
-DROP CONSTRAINT df_name
+BEGIN
+DROP TABLE Visitor
+PRINT('Am sters tabela Visitor')
 END
 
 EXEC down_from_v2

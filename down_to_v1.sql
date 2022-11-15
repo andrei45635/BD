@@ -1,12 +1,13 @@
 USE [Port]
-GO
+GO 
 
---Readuce la versiunea 1
-CREATE PROCEDURE down_from_v1
+--Readuce la versiunea 2
+CREATE PROCEDURE [dbo].[down_from_v1]
 AS
 BEGIN 
 ALTER TABLE Sailors 
-ALTER COLUMN SailorTimeAway INT
+DROP CONSTRAINT df_name
+PRINT('Nu mai avem constraint DEFAULT Anon la SailorName')
 END
 
 EXEC down_from_v1

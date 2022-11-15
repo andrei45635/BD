@@ -2,7 +2,7 @@ USE [Port]
 GO 
 
 --Adauga tabela Visitor
-CREATE PROCEDURE up_to_v3
+ALTER PROCEDURE [dbo].[up_to_v3]
 AS
 BEGIN
 CREATE TABLE Visitor(
@@ -11,6 +11,7 @@ CREATE TABLE Visitor(
 	VisitorAge INT CHECK(VisitorAge >= 5),
 	SailorID INT NOT NULL
 );
+PRINT('Am creat tabela Visitor')
 END
 
 EXEC up_to_v3
