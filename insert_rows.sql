@@ -1,7 +1,7 @@
 USE [Port]
 GO
 
-ALTER PROCEDURE insert_rows AS
+CREATE PROCEDURE insert_rows AS
 BEGIN
 DECLARE @noOfRows INT
 DECLARE @n INT

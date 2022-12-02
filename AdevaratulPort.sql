@@ -131,12 +131,6 @@ CREATE TABLE Sailors(
 	SailorTimeAway INT,
 	ShipID INT NOT NULL FOREIGN KEY REFERENCES Ships(ShipID),
 );
-
-CREATE TABLE Versions(
-	VersionNo INT
-);
-INSERT INTO Versions(VersionNo) VALUES(0)
-SELECT * FROM Versions
 --- CREARE BAZA DE DATE ---
 
 --- ALTERARI ---
@@ -275,6 +269,9 @@ INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Sa
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Konecranes');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Medium', 'Seacom');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Other', 'Mantsines');
+DELETE FROM Machinery
+DBCC CHECKIDENT ('Machinery', RESEED, 0)
+GO
 
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (1, 1, 'JesseYo');
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (2, 5, 'FrankB');
@@ -421,3 +418,83 @@ SELECT * FROM WarehouseResources;
 DELETE FROM Goods
 DBCC CHECKIDENT ('Goods', RESEED, 0)
 GO
+
+CREATE TABLE Tables(
+	TableID INT NOT NULL PRIMARY KEY IDENTITY,
+	Name VARCHAR(50)
+);
+
+INSERT INTO Tables(Name) VALUES('Machinery');
+INSERT INTO Tables(Name) VALUES('Employees');
+INSERT INTO Tables(Name) VALUES('MachineryEmployees');
+
+SELECT * FROM Tables;
+
+CREATE TABLE Views(
+	ViewID INT NOT NULL PRIMARY KEY IDENTITY,
+	Name VARCHAR(50)
+);
+
+INSERT INTO Views(Name) VALUES ('View1');
+INSERT INTO Views(Name) VALUES ('View2');
+INSERT INTO Views(Name) VALUES ('View3');
+
+SELECT * FROM Views;
+
+CREATE TABLE Tests(
+	TestID INT NOT NULL PRIMARY KEY IDENTITY,
+	Name VARCHAR(50)
+);
+
+INSERT INTO Tests(Name) VALUES ('insert_rows_machs');
+INSERT INTO Tests(Name) VALUES ('insert_rows_emps');
+INSERT INTO Tests(Name) VALUES ('insert_rows_machemps');
+INSERT INTO Tests(Name) VALUES ('select_view_1');
+INSERT INTO Tests(Name) VALUES ('select_view_2');
+INSERT INTO Tests(Name) VALUES ('select_view_3');
+INSERT INTO Tests(Name) VALUES ('delete_table_machemps');
+INSERT INTO Tests(Name) VALUES ('delete_table_machs');
+INSERT INTO Tests(Name) VALUES ('delete_table_emps');
+
+DELETE FROM Tests
+DBCC CHECKIDENT ('Tests', RESEED, 0)
+GO
+SELECT * FROM Tests;
+DELETE FROM Tests WHERE TestID = 3
+
+CREATE TABLE TestsViews(
+	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
+	ViewID INT NOT NULL FOREIGN KEY REFERENCES Views(ViewID),
+	CONSTRAINT pk_TestsViews PRIMARY KEY (TestID, ViewID)
+);
+
+INSERT INTO TestsViews(TestID, ViewID) VALUES(1,1);
+INSERT INTO TestsViews(TestID, ViewID) VALUES(2,2);
+INSERT INTO TestsViews(TestID, ViewID) VALUES(3,3);
+
+SELECT * FROM TestsViews;
+DELETE FROM TestsViews;
+
+CREATE TABLE TestTables(
+	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
+	TableID INT NOT NULL FOREIGN KEY REFERENCES Tables(TableID),
+	CONSTRAINT pk_TestsTables PRIMARY KEY (TestID, TableID),
+	NoOfRows INT,
+	Position INT
+);
+
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (1, 1, 1000, 1);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (2, 1, 1000, 2);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (3, 1, 1000, 3);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (4, 2, 1000, 7);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (5, 2, 1000, 8);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (6, 2, 1000, 9);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (7, 3, 1000, 4);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (8, 3, 1000, 5);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (9, 3, 1000, 6);
+
+SELECT * FROM TestTables;
+
+-- cheie primara si fara cheie straina -> Machinery
+-- cheie primara si cel putin o cheie straina -> Employees
+-- 2 campuri ca si cheie primara -> MachineryEmployees
