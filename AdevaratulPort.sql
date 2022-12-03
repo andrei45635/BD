@@ -416,32 +416,17 @@ DELETE FROM Goods
 DBCC CHECKIDENT ('Goods', RESEED, 0)
 GO
 
-CREATE TABLE Tables(
-	TableID INT NOT NULL PRIMARY KEY IDENTITY,
-	Name VARCHAR(50)
-);
-
 INSERT INTO Tables(Name) VALUES('Machinery');
 INSERT INTO Tables(Name) VALUES('Employees');
 INSERT INTO Tables(Name) VALUES('MachineryEmployees');
 
 SELECT * FROM Tables;
 
-CREATE TABLE Views(
-	ViewID INT NOT NULL PRIMARY KEY IDENTITY,
-	Name VARCHAR(50)
-);
-
 INSERT INTO Views(Name) VALUES ('View1');
 INSERT INTO Views(Name) VALUES ('View2');
 INSERT INTO Views(Name) VALUES ('View3');
 
 SELECT * FROM Views;
-
-CREATE TABLE Tests(
-	TestID INT NOT NULL PRIMARY KEY IDENTITY,
-	Name VARCHAR(50)
-);
 
 INSERT INTO Tests(Name) VALUES ('insert_rows_machs');
 INSERT INTO Tests(Name) VALUES ('insert_rows_emps');
@@ -453,30 +438,13 @@ INSERT INTO Tests(Name) VALUES ('delete_table_machemps');
 INSERT INTO Tests(Name) VALUES ('delete_table_machs');
 INSERT INTO Tests(Name) VALUES ('delete_table_emps');
 
-DELETE FROM Tests
-DBCC CHECKIDENT ('Tests', RESEED, 0)
-GO
 SELECT * FROM Tests;
-
-CREATE TABLE TestViews(
-	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
-	ViewID INT NOT NULL FOREIGN KEY REFERENCES Views(ViewID),
-	CONSTRAINT pk_TestsViews PRIMARY KEY (TestID, ViewID)
-);
 
 INSERT INTO TestViews(TestID, ViewID) VALUES(1,1);
 INSERT INTO TestViews(TestID, ViewID) VALUES(2,2);
 INSERT INTO TestViews(TestID, ViewID) VALUES(3,3);
 
 SELECT * FROM TestViews;
-
-CREATE TABLE TestTables(
-	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
-	TableID INT NOT NULL FOREIGN KEY REFERENCES Tables(TableID),
-	CONSTRAINT pk_TestsTables PRIMARY KEY (TestID, TableID),
-	NoOfRows INT,
-	Position INT
-);
 
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (1, 1, 1000, 1);
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (2, 1, 1000, 2);
