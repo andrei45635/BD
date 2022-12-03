@@ -9,7 +9,6 @@ DECLARE @date_end DATETIME
 
 BEGIN
 	SET NOCOUNT ON;
-
 	--inserting machineries
 	SET @date_start=GETDATE()
 	EXEC insert_rows_machs
@@ -93,10 +92,26 @@ SELECT * FROM MachineryEmployees
 SELECT * FROM Machinery
 SELECT * FROM Employees
 
-DELETE FROM Machinery WHERE MachineryID > 5
+DELETE FROM Employees
+DBCC CHECKIDENT ('Employees', RESEED, 0)
+GO
+DELETE FROM Machinery
+DBCC CHECKIDENT ('Machinery', RESEED, 0)
+GO
 DROP TABLE MachineryEmployees4
 
+DELETE FROM WarehouseEmployees
+DELETE FROM MachineryEmployees
+DELETE FROM Machinery
+DELETE FROM Employees
+
 EXEC main_test
+
+SELECT * FROM Tables
+SELECT * FROM TestTables
+SELECT * FROM Tests
+SELECT * FROM TestViews
+SELECT * FROM Views
 
 SELECT * FROM TestRunTables
 SELECT * FROM TestRunViews

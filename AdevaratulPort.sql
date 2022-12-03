@@ -262,22 +262,28 @@ INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, Emp
 INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1225, 150, 21, 2, 'Andrew Barnes');
 INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1200, 175, 29, 2, 'Frank Breen');
 INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1215, 235, 35, 4, 'Huell Babbitt');
-INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1345, 225, 18, 6, 'Robert Lewis');
+INSERT INTO Employees(EmployeeSalary, EmployeeBonus, EmployeeAge, ManagerID, EmployeeName) VALUES (1345, 225, 18, 5, 'Robert Lewis');
 
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Small', 'Hyundai');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Samsung');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Heavy', 'Konecranes');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Medium', 'Seacom');
 INSERT INTO Machinery(MachineryType, MachineryManufacturer) VALUES ('Other', 'Mantsines');
-DELETE FROM Machinery
-DBCC CHECKIDENT ('Machinery', RESEED, 0)
-GO
 
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (1, 1, 'JesseYo');
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (2, 5, 'FrankB');
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (3, 6, 'HuellBabby');
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (4, 2, 'Gina');
 INSERT INTO MachineryEmployees(MachineryID, EmployeeID, MachineryUser) VALUES (5, 4, 'BarnacleMan');
+
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 1)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 5)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (2, 4)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (3, 6)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (4, 2)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (5, 3)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 6)
+INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 3)
 
 INSERT INTO Goods(GoodsType, GoodsName, GoodsWeight, GoodsPrice) VALUES ('Special', 'Half-Life', 4200, 59.99)
 INSERT INTO Goods(GoodsType, GoodsName, GoodsWeight, GoodsPrice) VALUES ('Industrial', 'Steel Rods', 9000, 119.99)
@@ -361,15 +367,6 @@ INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (2, 3, 1009)
 INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (1, 6, 4995)
 INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (4, 7, 2482)
 INSERT INTO ShipResources(ResourceID, ShipID, CargoWeight) VALUES (3, 3, 549)
-
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 1)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (1, 5)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (2, 4)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (3, 6)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (4, 2)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (5, 3)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 6)
-INSERT INTO WarehouseEmployees(EmployeeID, WarehouseID) VALUES (7, 3)
 
 INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (1, 1)
 INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (6, 1)
@@ -460,20 +457,18 @@ DELETE FROM Tests
 DBCC CHECKIDENT ('Tests', RESEED, 0)
 GO
 SELECT * FROM Tests;
-DELETE FROM Tests WHERE TestID = 3
 
-CREATE TABLE TestsViews(
+CREATE TABLE TestViews(
 	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
 	ViewID INT NOT NULL FOREIGN KEY REFERENCES Views(ViewID),
 	CONSTRAINT pk_TestsViews PRIMARY KEY (TestID, ViewID)
 );
 
-INSERT INTO TestsViews(TestID, ViewID) VALUES(1,1);
-INSERT INTO TestsViews(TestID, ViewID) VALUES(2,2);
-INSERT INTO TestsViews(TestID, ViewID) VALUES(3,3);
+INSERT INTO TestViews(TestID, ViewID) VALUES(1,1);
+INSERT INTO TestViews(TestID, ViewID) VALUES(2,2);
+INSERT INTO TestViews(TestID, ViewID) VALUES(3,3);
 
-SELECT * FROM TestsViews;
-DELETE FROM TestsViews;
+SELECT * FROM TestViews;
 
 CREATE TABLE TestTables(
 	TestID INT NOT NULL FOREIGN KEY REFERENCES Tests(TestID),
