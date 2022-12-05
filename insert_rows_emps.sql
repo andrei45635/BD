@@ -12,8 +12,9 @@ SET IDENTITY_INSERT Employees ON;
 
 --Inserting Employees--
 SELECT TOP 1 @fk1 = ManagerID FROM [dbo].Managers ORDER BY NEWID()
+SELECT TOP 1 @noOfRows = NoOfRows FROM [dbo].TestTables
 
-SET @n=7
+SET @n=8
 WHILE @n < @noOfRows
 	BEGIN
 		SET @t = 'Employee' + CONVERT(VARCHAR(5), @n)

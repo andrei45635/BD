@@ -449,8 +449,10 @@ INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (1, 1, 1000, 
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (2, 2, 1000, 2);
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (3, 3, 1000, 3);
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (4, 3, 1000, 3);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (5, 2, 1000, 2);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (6, 1, 1000, 1);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (5, 1, 1000, 2);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (6, 2, 1000, 1);
+
+DELETE FROM TestTables;
 
 SELECT * FROM TestTables;
 

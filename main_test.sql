@@ -20,8 +20,8 @@ BEGIN
 	IF @table = 'Machinery'
 		BEGIN
 			SET @date_start = GETDATE()
-			EXEC insert_rows_machs
 			EXEC delete_table_machs
+			EXEC insert_rows_machs
 			SET @date_mid = GETDATE()
 			EXEC select_view View1
 			SET @date_end = GETDATE()
@@ -34,8 +34,8 @@ BEGIN
 	IF @table = 'Employees'
 		BEGIN
 			SET @date_start = GETDATE()
-			EXEC insert_rows_emps
 			EXEC delete_table_emps
+			EXEC insert_rows_emps
 			SET @date_mid = GETDATE()
 			EXEC select_view View2 
 			SET @date_end = GETDATE()
@@ -48,8 +48,8 @@ BEGIN
 	IF @table = 'MachineryEmployees'
 		BEGIN
 			SET @date_start = GETDATE()
-			EXEC insert_rows_machemps
 			EXEC delete_table_machemps
+			EXEC insert_rows_machemps
 			SET @date_mid = GETDATE()
 			EXEC select_view View3 
 			SET @date_end = GETDATE()
@@ -64,7 +64,6 @@ SELECT * FROM WarehouseEmployees
 SELECT * FROM MachineryEmployees
 SELECT * FROM Machinery
 SELECT * FROM Employees
-SELECT * FROM MachineryEmployees4
 
 DELETE FROM Employees
 DBCC CHECKIDENT ('Employees', RESEED, 0)
@@ -72,16 +71,15 @@ GO
 DELETE FROM Machinery
 DBCC CHECKIDENT ('Machinery', RESEED, 0)
 GO
-DROP TABLE MachineryEmployees4
 
 DELETE FROM WarehouseEmployees
 DELETE FROM MachineryEmployees
 DELETE FROM Machinery
 DELETE FROM Employees
 
+EXEC main_test MachineryEmployees
 EXEC main_test Machinery
 EXEC main_test Employees
-EXEC main_test MachineryEmployees
 
 SELECT * FROM Tables
 SELECT * FROM TestTables
