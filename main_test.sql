@@ -1,96 +1,70 @@
 USE [Port]
 GO
 
-ALTER PROCEDURE main_test AS
+ALTER PROCEDURE main_test (@table VARCHAR(30)) AS 
+DECLARE @date_start DATETIME
+DECLARE @date_mid DATETIME
+DECLARE @date_end DATETIME
 DECLARE @desc VARCHAR(100)
 DECLARE @id1 INT
-DECLARE @date_start DATETIME
-DECLARE @date_end DATETIME
 
 BEGIN
 	SET NOCOUNT ON;
-	--inserting machineries
-	SET @date_start=GETDATE()
-	EXEC insert_rows_machs
-	SET @date_end = GETDATE()
-	SET @id1 = @@IDENTITY
-	SET @desc = 'inserted in table with 1 primary key'
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 1, @date_start, @date_end)
 
-	--inserting employees
-	SET @date_start = GETDATE()
-	EXEC insert_rows_emps
-	SET @date_end = GETDATE()
-	SET @id1 = @@IDENTITY
-	SET @desc = 'inserted in table with 1 primary key and 1 foreign key'
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 2, @date_start, @date_end)
+	IF ISNUMERIC(@table) = 1
+		BEGIN
+			PRINT('Tabela trebuie sa fie string!')
+			RETURN 1
+		END
 
-	--inserting machinery employees
-	SET @date_start = GETDATE()
-	EXEC insert_rows_machemps
-	SET @date_end = GETDATE()
-	SET @id1 = @@IDENTITY
-	SET @desc = 'inserted in complex table'
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 3, @date_start, @date_end)
+	IF @table = 'Machinery'
+		BEGIN
+			SET @date_start = GETDATE()
+			EXEC insert_rows_machs
+			EXEC delete_table_machs
+			SET @date_mid = GETDATE()
+			EXEC select_view View1
+			SET @date_end = GETDATE()
+			INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES ('Test pe Machinery, inserare 1000 elemente si stergere + view', @date_start, @date_end)
+			SELECT TOP 1 @id1 = TestRunID FROM TestRuns ORDER BY NEWID()
+			INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 1, @date_start, @date_mid)
+			INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 1, @date_mid, @date_end)
+		END
 
-	--view 1
-	SET @date_start = GETDATE()
-	SELECT * FROM View1
-	SET @date_end=GETDATE()
-	PRINT @id1
-	INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 1, @date_start, @date_end)
+	IF @table = 'Employees'
+		BEGIN
+			SET @date_start = GETDATE()
+			EXEC insert_rows_emps
+			EXEC delete_table_emps
+			SET @date_mid = GETDATE()
+			EXEC select_view View2 
+			SET @date_end = GETDATE()
+			INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES ('Test pe Employees, inserare 1000 elemente si stergere + view', @date_start, @date_end)
+			SELECT TOP 1 @id1 = TestRunID FROM TestRuns ORDER BY NEWID()
+			INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 2, @date_start, @date_mid)
+			INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 2, @date_mid, @date_end)
+		END
 
-	--view 2
-	SET @date_start = GETDATE()
-	SELECT * FROM View2
-	SET @date_end=GETDATE()
-	PRINT @id1
-	INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 2, @date_start, @date_end)
-
-	--view 3
-	SET @date_start = GETDATE()
-	SELECT * FROM View3
-	SET @date_end=GETDATE()
-	PRINT @id1
-	INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 3, @date_start, @date_end)
-
-	--delete from the complex table
-	SET @date_start = GETDATE()
-	EXEC delete_table_machemps
-	SET @date_end = GETDATE()
-	SET @desc = 'deleted from the complex table'
-	SET @id1 = @@IDENTITY
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 3, @date_start, @date_end)
-
-	--delete machineries
-	SET @date_start = GETDATE()
-	EXEC delete_table_machs
-	SET @date_end = GETDATE()
-	SET @desc = 'deleted machineries'
-	SET @id1 = @@IDENTITY
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 1, @date_start, @date_end)
-
-	--delete employees
-	SET @date_start = GETDATE()
-	EXEC delete_table_emps
-	SET @date_end = GETDATE()
-	SET @desc = 'deleted employees'
-	SET @id1 = @@IDENTITY
-	INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES (@desc, @date_start, @date_end)
-	INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 2, @date_start, @date_end)
-
-	UPDATE TestRuns SET EndAt = @date_end WHERE TestRunID = @id1
+	IF @table = 'MachineryEmployees'
+		BEGIN
+			SET @date_start = GETDATE()
+			EXEC insert_rows_machemps
+			EXEC delete_table_machemps
+			SET @date_mid = GETDATE()
+			EXEC select_view View3 
+			SET @date_end = GETDATE()
+			INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES ('Test pe MachineryEmployees, inserare 1000 elemente si stergere + view', @date_start, @date_end)
+			SELECT TOP 1 @id1 = TestRunID FROM TestRuns ORDER BY NEWID()
+			INSERT INTO TestRunTables(TestRunID, TableID, StartAt, EndAt) VALUES (@id1, 3, @date_start, @date_mid)
+			INSERT INTO TestRunViews(TestRunID, ViewID, StartAt, EndAt) VALUES (@id1, 3, @date_mid, @date_end)
+		END
 END
 
 SELECT * FROM WarehouseEmployees
 SELECT * FROM MachineryEmployees
 SELECT * FROM Machinery
 SELECT * FROM Employees
+SELECT * FROM MachineryEmployees4
 
 DELETE FROM Employees
 DBCC CHECKIDENT ('Employees', RESEED, 0)
@@ -105,13 +79,21 @@ DELETE FROM MachineryEmployees
 DELETE FROM Machinery
 DELETE FROM Employees
 
-EXEC main_test
+EXEC main_test Machinery
+EXEC main_test Employees
+EXEC main_test MachineryEmployees
 
 SELECT * FROM Tables
 SELECT * FROM TestTables
 SELECT * FROM Tests
 SELECT * FROM TestViews
 SELECT * FROM Views
+
+DELETE FROM Tables
+DELETE FROM TestTables
+DELETE FROM Tests
+DELETE FROM TestViews
+DELETE FROM Views
 
 SELECT * FROM TestRunTables
 SELECT * FROM TestRunViews
@@ -120,3 +102,12 @@ SELECT * FROM TestRuns
 DELETE FROM TestRunTables
 DELETE FROM TestRunViews
 DELETE FROM TestRuns
+
+DROP TABLE TestRunViews
+DROP TABLE TestRunTables
+DROP TABLE TestRuns
+DROP TABLE TestTables
+DROP TABLE TestViews
+DROP TABLE Tests
+DROP TABLE Tables
+DROP TABLE Views

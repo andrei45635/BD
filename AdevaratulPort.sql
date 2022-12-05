@@ -1,7 +1,8 @@
 CREATE DATABASE Port
 GO 
 
-USE Port;
+USE [Port]
+GO
 
 --- CREARE BAZA DE DATE ---
 CREATE TABLE Managers(
@@ -431,30 +432,25 @@ SELECT * FROM Views;
 INSERT INTO Tests(Name) VALUES ('insert_rows_machs');
 INSERT INTO Tests(Name) VALUES ('insert_rows_emps');
 INSERT INTO Tests(Name) VALUES ('insert_rows_machemps');
-INSERT INTO Tests(Name) VALUES ('select_view_1');
-INSERT INTO Tests(Name) VALUES ('select_view_2');
-INSERT INTO Tests(Name) VALUES ('select_view_3');
 INSERT INTO Tests(Name) VALUES ('delete_table_machemps');
 INSERT INTO Tests(Name) VALUES ('delete_table_machs');
 INSERT INTO Tests(Name) VALUES ('delete_table_emps');
+INSERT INTO Tests(Name) VALUES ('select_view');
 
 SELECT * FROM Tests;
 
-INSERT INTO TestViews(TestID, ViewID) VALUES(1,1);
-INSERT INTO TestViews(TestID, ViewID) VALUES(2,2);
-INSERT INTO TestViews(TestID, ViewID) VALUES(3,3);
+INSERT INTO TestViews(TestID, ViewID) VALUES(7,1);
+INSERT INTO TestViews(TestID, ViewID) VALUES(7,2);
+INSERT INTO TestViews(TestID, ViewID) VALUES(7,3);
 
 SELECT * FROM TestViews;
 
 INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (1, 1, 1000, 1);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (2, 1, 1000, 2);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (3, 1, 1000, 3);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (4, 2, 1000, 7);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (5, 2, 1000, 8);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (6, 2, 1000, 9);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (7, 3, 1000, 4);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (8, 3, 1000, 5);
-INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (9, 3, 1000, 6);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (2, 2, 1000, 2);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (3, 3, 1000, 3);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (4, 3, 1000, 3);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (5, 2, 1000, 2);
+INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES (6, 1, 1000, 1);
 
 SELECT * FROM TestTables;
 
