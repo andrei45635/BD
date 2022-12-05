@@ -28,10 +28,17 @@ CREATE TABLE Machinery(
 );
 
 CREATE TABLE MachineryEmployees(
-	MachineryID INT NOT NULL FOREIGN KEY REFERENCES Machinery(MachineryID),
-	EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID),
+	MachineryID INT NOT NULL FOREIGN KEY REFERENCES Machinery(MachineryID) ON DELETE CASCADE,
+	EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID) ON DELETE CASCADE,
+	MachineryUser VARCHAR(50), 
 	CONSTRAINT pk_MachineryEmployees PRIMARY KEY(MachineryID, EmployeeID)
 );
+
+DROP TABLE MachineryEmployees
+
+ALTER TABLE MachineryEmployees DROP CONSTRAINT FK__Machinery__Machi__5070F446
+ALTER TABLE MachineryEmployees DROP CONSTRAINT FK__Machinery__Machi__5070F446
+ALTER TABLE MachineryEmployees ADD CONSTRAINT MachineryID FOREIGN KEY REFERENCES Machinery(MachineryID) ON DELETE CASCADE
 
 CREATE TABLE Warehouses(
 	WarehouseID INT NOT NULL PRIMARY KEY IDENTITY,
@@ -41,10 +48,12 @@ CREATE TABLE Warehouses(
 );
 
 CREATE TABLE WarehouseEmployees(
-	EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID),
-	WarehouseID INT NOT NULL FOREIGN KEY REFERENCES Warehouses(WarehouseID),
+	EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID) ON DELETE CASCADE,
+	WarehouseID INT NOT NULL FOREIGN KEY REFERENCES Warehouses(WarehouseID) ON DELETE CASCADE,
 	CONSTRAINT pk_WarehouseEmployees PRIMARY KEY(WarehouseID, EmployeeID)
 );
+
+DROP TABLE WarehouseEmployees;
 
 CREATE TABLE Goods(
 	GoodsID INT NOT NULL PRIMARY KEY IDENTITY,

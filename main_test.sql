@@ -61,6 +61,11 @@ BEGIN
 		END
 END
 
+EXEC main_test Machinery
+EXEC main_test Employees
+EXEC main_test MachineryEmployees
+
+--- UTILS ---
 SELECT * FROM WarehouseEmployees
 SELECT * FROM MachineryEmployees
 SELECT * FROM Machinery
@@ -81,10 +86,6 @@ DELETE FROM WarehouseEmployees
 DELETE FROM MachineryEmployees
 DELETE FROM Machinery
 DELETE FROM Employees
-
-EXEC main_test Machinery
-EXEC main_test Employees
-EXEC main_test MachineryEmployees
 
 SELECT * FROM Tables
 SELECT * FROM TestTables
