@@ -37,7 +37,8 @@ BEGIN
 			EXEC delete_table_emps
 			EXEC insert_rows_emps
 			SET @date_mid = GETDATE()
-			EXEC select_view View2 
+			SELECT * FROM View21
+			--EXEC select_view View2 
 			SET @date_end = GETDATE()
 			INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES ('Test pe Employees, inserare 1000 elemente si stergere + view', @date_start, @date_end)
 			SELECT TOP 1 @id1 = TestRunID FROM TestRuns ORDER BY NEWID()
@@ -51,7 +52,7 @@ BEGIN
 			EXEC delete_table_machemps
 			EXEC insert_rows_machemps
 			SET @date_mid = GETDATE()
-			EXEC select_view View3 
+			EXEC select_view View3
 			SET @date_end = GETDATE()
 			INSERT INTO TestRuns(Description, StartAt, EndAt) VALUES ('Test pe MachineryEmployees, inserare 1000 elemente si stergere + view', @date_start, @date_end)
 			SELECT TOP 1 @id1 = TestRunID FROM TestRuns ORDER BY NEWID()
@@ -72,14 +73,18 @@ DELETE FROM Machinery
 DBCC CHECKIDENT ('Machinery', RESEED, 0)
 GO
 
+SELECT * FROM View1;
+SELECT * FROM View2;
+SELECT * FROM View3;
+
 DELETE FROM WarehouseEmployees
 DELETE FROM MachineryEmployees
 DELETE FROM Machinery
 DELETE FROM Employees
 
-EXEC main_test MachineryEmployees
 EXEC main_test Machinery
 EXEC main_test Employees
+EXEC main_test MachineryEmployees
 
 SELECT * FROM Tables
 SELECT * FROM TestTables
