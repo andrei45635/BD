@@ -102,7 +102,7 @@ BEGIN
 	SET @msg = ''
 	SET @sumaErr = 0
 
-	IF dbo.validareCorporationID(@CorpoID) = 1
+	IF dbo.validareCorpoID(@CorpoID) = 1
 	BEGIN
 		SET @msg = @msg + ' resource id invalid! '
 	END
@@ -112,7 +112,7 @@ BEGIN
 		SET @msg = @msg + ' corpo id invalid! '
 	END
 
-	SET @sumaErr = @sumaErr + dbo.validareCorporationID(@CorpoID) + dbo.validareResourceID(@ResourceID)
+	SET @sumaErr = @sumaErr + dbo.validareCorpoID(@CorpoID) + dbo.validareResourceID(@ResourceID)
 	IF @sumaErr > 0
 	BEGIN
 		SET @flag = 1
@@ -162,7 +162,7 @@ BEGIN
 			UPDATE Corporations SET CorporationCountry = 'Romania' WHERE CorporationGoods = 'Petrol'
 
 			--- DELETE ---
-			DELETE FROM Corporations WHERE CorporationGoods = 'Bunuri'
+			DELETE FROM Corporations WHERE CorporationGoods = 'Austria'
 
 			PRINT 'CRUD operations for table Corporations' 
 		END
@@ -245,7 +245,7 @@ BEGIN
 			UPDATE CorporationResources SET @CorpoID = 1 WHERE @ResourceID = 2
 
 			--- DELETE ---
-			DELETE FROM CorporationResources WHERE @CorpoID = 1
+			DELETE FROM CorporationResources WHERE @CorpoID BETWEEN 5 AND 10
 		END
 END
 GO
@@ -255,5 +255,12 @@ DELETE FROM Corporations WHERE CorporationID BETWEEN 23 AND 27
 EXEC CorpoCRUD 15, 12, 14, 5 
 
 EXEC CorpoCRUD 'America', 'Bunuri', 'Vegetale', 10
+EXEC ResourceCRUD 'Synthetic', 'Bunuri', 2500, 14999, 10
+EXEC CorpoResCRUD 79, 4
+
+SELECT * FROM Corporations
+
+SELECT TOP 1 ResourceID FROM Resources ORDER BY ResourceID ASC
+SELECT TOP 1 ResourceID FROM Resources ORDER BY ResourceID DESC
 
 -- TODO: Main CRUD and Views + Indexes!!!!!!

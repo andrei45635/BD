@@ -72,18 +72,18 @@ END
 GO
 
 -- functie de validare pt ResourceID
-CREATE OR ALTER FUNCTION [dbo].validareResoruceID (@ResoID INT)
+CREATE OR ALTER FUNCTION [dbo].validareResourceID (@ResoID INT)
 RETURNS BIT
 AS
 BEGIN
 	DECLARE @flag INT
 	DECLARE @begin INT
 	DECLARE @end INT
-	
+
 	SELECT TOP 1 @begin = ResourceID FROM Resources ORDER BY ResourceID ASC
 	SELECT TOP 1 @end = ResourceID FROM Resources ORDER BY ResourceID DESC
 	
-	IF @ResoID BETWEEN @begin AND @end
+	IF @ResoID NOT BETWEEN @begin AND @end
 	BEGIN
 		SET @flag = 1
 	END
