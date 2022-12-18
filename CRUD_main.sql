@@ -162,7 +162,7 @@ BEGIN
 			UPDATE Corporations SET CorporationCountry = 'Romania' WHERE CorporationGoods = 'Petrol'
 
 			--- DELETE ---
-			DELETE FROM Corporations WHERE CorporationGoods = 'Petrol'
+			DELETE FROM Corporations WHERE CorporationGoods = 'Bunuri'
 
 			PRINT 'CRUD operations for table Corporations' 
 		END
@@ -206,10 +206,10 @@ BEGIN
 			SELECT * FROM Resources
 
 			--- UPDATE --- 
-			UPDATE Resources SET ResourcePrice = 6999 WHERE ResourceWeight BETWEEN 1000 AND 2500
+			UPDATE Resources SET ResourcePrice = @price WHERE ResourceWeight BETWEEN 1000 AND 2500
 
 			--- DELETE ---
-			DELETE FROM Resources WHERE ResourcePrice = 6999
+			DELETE FROM Resources WHERE ResourcePrice = @price
 
 			PRINT 'CRUD operations for table Resources' 
 		END
@@ -250,5 +250,10 @@ BEGIN
 END
 GO
 
+DELETE FROM Corporations WHERE CorporationID BETWEEN 23 AND 27
+
+EXEC CorpoCRUD 15, 12, 14, 5 
+
+EXEC CorpoCRUD 'America', 'Bunuri', 'Vegetale', 10
 
 -- TODO: Main CRUD and Views + Indexes!!!!!!
