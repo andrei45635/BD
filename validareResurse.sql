@@ -43,6 +43,8 @@ GO
 -- valideaza greutatea resursei
 -- greutatea trebuie sa fie intre 10 si 9999
 -- greutatea trebuie sa fie float 
+-- IF @weight NOT BETWEEN 10 AND 9999 OR ISNUMERIC(@weight) = 0
+
 CREATE OR ALTER FUNCTION [dbo].validareGreutateResursa (@weight FLOAT)
 RETURNS BIT
 AS
@@ -58,6 +60,7 @@ GO
 
 -- valideaza pretul resursei
 -- pretul trebuie sa fie float si not null
+-- IF ISNUMERIC(@price) = 0 OR @price < 0
 CREATE OR ALTER FUNCTION [dbo].validarePretResursa (@price FLOAT)
 RETURNS BIT
 AS

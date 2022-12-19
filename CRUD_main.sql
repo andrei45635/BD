@@ -184,10 +184,9 @@ BEGIN
 	DECLARE @currentNoOfRows INT
 	DECLARE @msg VARCHAR(250)
 	DECLARE @flag BIT
-	DECLARE @corpoGoods VARCHAR(50)
 
 	-- verificare date
-	EXEC dbo.verificareResurse @flag OUTPUT, @msg OUTPUT, @type, @weight, @name, @price
+	EXEC dbo.verificareResurse @flag OUTPUT, @msg OUTPUT, @type, @name, @weight, @price
 
 	IF @flag = 1
 		PRINT 'Erori: ' + @msg
@@ -206,7 +205,7 @@ BEGIN
 			SELECT * FROM Resources
 
 			--- UPDATE --- 
-			UPDATE Resources SET ResourcePrice = @price WHERE ResourceWeight BETWEEN 1000 AND 2500
+			UPDATE Resources SET ResourcePrice = @price WHERE ResourceWeight BETWEEN 7000 AND 8000
 
 			--- DELETE ---
 			DELETE FROM Resources WHERE ResourcePrice = @price
@@ -239,28 +238,37 @@ BEGIN
 			INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (@CorpoID, @ResourceID)
 
 			--- SELECT ---
-			SELECT * FROM CorporationGoods
+			SELECT * FROM CorporationResources
 
 			--- UPDATE --- 
-			UPDATE CorporationResources SET @CorpoID = 1 WHERE @ResourceID = 2
+			UPDATE CorporationResources SET CorporationID = 1 WHERE ResourceID = 2
 
 			--- DELETE ---
-			DELETE FROM CorporationResources WHERE @CorpoID BETWEEN 5 AND 10
+			DELETE FROM CorporationResources WHERE CorporationID BETWEEN 5 AND 10
 		END
 END
 GO
 
 DELETE FROM Corporations WHERE CorporationID BETWEEN 23 AND 27
 
+-- execs that don't work 
 EXEC CorpoCRUD 15, 12, 14, 5 
+EXEC CorpoResCRUD 0, 0
+EXEC ResourceCRUD 'Ceva', 124, 1, -10, 10
 
-EXEC CorpoCRUD 'America', 'Bunuri', 'Vegetale', 10
-EXEC ResourceCRUD 'Synthetic', 'Bunuri', 2500, 14999, 10
-EXEC CorpoResCRUD 79, 4
+--execs that work
+EXEC CorpoCRUD 'SUA', 'Ingrediente', 'Knoll', 100
+EXEC ResourceCRUD 'Natural', 'Gas', 4201.99, 69.99, 100
+EXEC CorpoResCRUD 81, 1
+EXEC CorpoResCRUD 84, 4
+
+SELECT * FROM [dbo].viewCorporations
+SELECT * FROM [dbo].viewResources
+SELECT * FROM [dbo].viewCorporationResources
 
 SELECT * FROM Corporations
+SELECT * FROM Resources
+SELECT * FROM CorporationResources
 
 SELECT TOP 1 ResourceID FROM Resources ORDER BY ResourceID ASC
 SELECT TOP 1 ResourceID FROM Resources ORDER BY ResourceID DESC
-
--- TODO: Main CRUD and Views + Indexes!!!!!!
