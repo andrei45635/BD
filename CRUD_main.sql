@@ -159,10 +159,10 @@ BEGIN
 			SELECT * FROM Corporations
 
 			--- UPDATE --- 
-			UPDATE Corporations SET CorporationCountry = 'Romania' WHERE CorporationGoods = 'Petrol'
+			UPDATE Corporations SET CorporationCountry = 'Australia' WHERE CorporationGoods = 'Australium'
 
 			--- DELETE ---
-			DELETE FROM Corporations WHERE CorporationGoods = 'Austria'
+			DELETE FROM Corporations WHERE CorporationCountry = 'Australia'
 
 			PRINT 'CRUD operations for table Corporations' 
 		END
@@ -205,10 +205,10 @@ BEGIN
 			SELECT * FROM Resources
 
 			--- UPDATE --- 
-			UPDATE Resources SET ResourcePrice = @price WHERE ResourceWeight BETWEEN 7000 AND 8000
+			UPDATE Resources SET ResourcePrice = 69 WHERE ResourceWeight BETWEEN 7000 AND 8000
 
 			--- DELETE ---
-			DELETE FROM Resources WHERE ResourcePrice = @price
+			DELETE FROM Resources WHERE ResourceWeight BETWEEN 7000 AND 8000
 
 			PRINT 'CRUD operations for table Resources' 
 		END
@@ -244,7 +244,7 @@ BEGIN
 			UPDATE CorporationResources SET CorporationID = 1 WHERE ResourceID = 2
 
 			--- DELETE ---
-			DELETE FROM CorporationResources WHERE CorporationID BETWEEN 5 AND 10
+			DELETE FROM CorporationResources WHERE CorporationID = 1 AND ResourceID = 2
 		END
 END
 GO
@@ -257,16 +257,18 @@ EXEC CorpoResCRUD 0, 0
 EXEC ResourceCRUD 'Ceva', 124, 1, -10, 10
 
 --execs that work
-EXEC CorpoCRUD 'SUA', 'Ingrediente', 'Knoll', 100
-EXEC ResourceCRUD 'Natural', 'Gas', 4201.99, 69.99, 100
+EXEC CorpoCRUD 'CevaTara', 'Australium', 'CevaNume', 1000
+EXEC ResourceCRUD 'Natural', 'Gas', 7500, 69.99, 2000
 EXEC CorpoResCRUD 81, 1
 EXEC CorpoResCRUD 84, 4
 
-SELECT * FROM [dbo].viewCorporations
-SELECT * FROM [dbo].viewResources
-SELECT * FROM [dbo].viewCorporationResources
+INSERT INTO Corporations(CorporationCountry, CorporationGoods, CorpoName) VALUES ('A', 'Australium', 'MannCo')
 
-SELECT * FROM Corporations
+SELECT * FROM [dbo].viewCorporations ORDER BY CorpoName
+SELECT * FROM [dbo].viewResources ORDER BY ResourcePrice
+SELECT * FROM [dbo].viewCorporationResources ORDER BY CorporationID
+
+SELECT * FROM Corporations 
 SELECT * FROM Resources
 SELECT * FROM CorporationResources
 
