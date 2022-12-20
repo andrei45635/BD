@@ -236,6 +236,9 @@ BEGIN
 			PRINT 'OK'
 			--- INSERT ---
 			INSERT INTO CorporationResources(CorporationID, ResourceID) VALUES (@CorpoID, @ResourceID)
+			--INSERT INTO CorporationResources
+			--SELECT CorporationID, ResourceID
+			--FROM Corporations CROSS JOIN Resources WHERE CorporationID > 7 AND ResourceID > 5
 
 			--- SELECT ---
 			SELECT * FROM CorporationResources
@@ -251,22 +254,22 @@ GO
 
 DELETE FROM Corporations WHERE CorporationID BETWEEN 23 AND 27
 
--- execs that don't work 
 EXEC CorpoCRUD 15, 12, 14, 5 
 EXEC CorpoResCRUD 0, 0
-EXEC ResourceCRUD 'Ceva', 124, 1, -10, 10
 
---execs that work
 EXEC CorpoCRUD 'CevaTara', 'Australium', 'CevaNume', 1000
-EXEC ResourceCRUD 'Natural', 'Gas', 7500, 69.99, 2000
-EXEC CorpoResCRUD 81, 1
-EXEC CorpoResCRUD 84, 4
+EXEC CorpoCRUD 'Tara', 'Bunuri', 'Nume', 3000
+EXEC ResourceCRUD 'Natural', 'Gas', 3500, 69.99, 2000
+EXEC CorpoResCRUD 1012, 1
+EXEC CorpoResCRUD 1015, 4
 
 INSERT INTO Corporations(CorporationCountry, CorporationGoods, CorpoName) VALUES ('A', 'Australium', 'MannCo')
 
 SELECT * FROM [dbo].viewCorporations ORDER BY CorpoName
 SELECT * FROM [dbo].viewResources ORDER BY ResourcePrice
 SELECT * FROM [dbo].viewCorporationResources ORDER BY CorporationID
+SELECT * FROM [dbo].viewCorpResc ORDER BY CorpoName
+SELECT * FROM [dbo].viewTest ORDER BY ResourceID
 
 SELECT * FROM Corporations 
 SELECT * FROM Resources
